@@ -56,7 +56,6 @@ namespace SaljPartOrderForms
                 //dsOGR.BeforePost += on_BeforePostOrderRow;
                 //dsOGA.AfterScroll += on_AfterScrollOrder;
                 dsOGR.AfterScroll += on_AfterScrollOrderRow;
-                //MessageBox.Show("FORMS CREATED");
 
             }
             catch (Exception ex)

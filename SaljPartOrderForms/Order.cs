@@ -40,7 +40,7 @@ namespace SaljPartOrderForms
         private decimal cUrsprAntal;
 
         private bool blndebugg = false;
-
+        private string savedRowNo = "";
 
 
         public Order()
@@ -178,11 +178,12 @@ namespace SaljPartOrderForms
                 a = 2;
 
                 sOrderNr = CompOrder.Item("onrEdit").Text;
-                iOrderRadNr = Convert.ToInt32(CompOrder.Item("oradEdit").Text);
-
+                iOrderRadNr = Convert.ToInt32(dsOGR.Fields.Item("RDC").Value); //Convert.ToInt32(CompOrder.Item("oradEdit").Text);
+                
                 //MessageBox.Show("iOrderRadNr " + iOrderRadNr);
 
                 iLevFlagga = Convert.ToInt32(CompOrder.Item("ogrLvfMcedit").Text.Substring(0, 1));
+                
 
                 // Hide certain components
                 CompOrder.Item("vrabattGroupBox").Visible = false;
@@ -222,7 +223,7 @@ namespace SaljPartOrderForms
                     BeräknaNetto();
                     a = 10;
                 }
-
+                //MessageBox.Show("FieldExit added " + iOrderRadNr);
                 oGarp.FieldEnter += FieldEnter;
                 oGarp.FieldExit += FieldExit;
             }
@@ -336,7 +337,7 @@ namespace SaljPartOrderForms
                     edbPallRab.MaxLength = 6;
                     edbPallRab.Width = 58;
                     edbPallRab.Height = 20;
-                    edbPallRab.Text = "0.00";  //TODO Format(CompOrder.Item("ogrPriMcEdit").Text, "@@@@@@@@@");
+                    edbPallRab.Text = "0.00";
                     edbPallRab.TabStop = false;
 
                     edbKvantRab.Top = 125;
@@ -344,7 +345,7 @@ namespace SaljPartOrderForms
                     edbKvantRab.MaxLength = 11;
                     edbKvantRab.Width = 58;
                     edbKvantRab.Height = 20;
-                    edbKvantRab.Text = "0.00"; //TODO Format(CompOrder.Item("ogrPriMcEdit").Text, "@@@@@@@@@");
+                    edbKvantRab.Text = "0.00";
                     edbKvantRab.TabStop = false;
 
                     edbAvtalsRab.Top = 125;
@@ -352,7 +353,7 @@ namespace SaljPartOrderForms
                     edbAvtalsRab.MaxLength = 11;
                     edbAvtalsRab.Width = 58;
                     edbAvtalsRab.Height = 20;
-                    edbAvtalsRab.Text = "0.00"; //TODO Format(CompOrder.Item("ogrPriMcEdit").Text, "@@@@@@@@@");
+                    edbAvtalsRab.Text = "0.00";
                     edbAvtalsRab.TabStop = false;
 
                     edbAktRab.Top = 125;
@@ -360,7 +361,7 @@ namespace SaljPartOrderForms
                     edbAktRab.MaxLength = 11;
                     edbAktRab.Width = 58;
                     edbAktRab.Height = 20;
-                    edbAktRab.Text = "0.00"; //TODO Format(CompOrder.Item("ogrPriMcEdit").Text, "@@@@@@@@@");
+                    edbAktRab.Text = "0.00";
                     edbAktRab.TabStop = false;
 
                     edbKundRab.Top = 125;
@@ -368,7 +369,7 @@ namespace SaljPartOrderForms
                     edbKundRab.MaxLength = 11;
                     edbKundRab.Width = 58;
                     edbKundRab.Height = 20;
-                    edbKundRab.Text = "0.00"; //TODO Format(CompOrder.Item("ogrPriMcEdit").Text, "@@@@@@@@@");
+                    edbKundRab.Text = "0.00";            
                     edbKundRab.TabStop = false;
 
                     edbRadText.Top = 160;
@@ -376,6 +377,7 @@ namespace SaljPartOrderForms
                     edbRadText.MaxLength = 60;
                     edbRadText.Width = 300;
                     edbRadText.Height = 20;
+
                     a = 5;
                     CompOrder.Item("artikelinfoedit").Top = 160;
                     a = 6;
@@ -550,9 +552,25 @@ namespace SaljPartOrderForms
                     }
                     if (CompOrder.CurrentField == "edbRadText") // Lägger upp textvärdet som en extern orderradstext.
                     {
-                        if (edbRadText.Text.Trim() != string.Empty)
+
+                        if (!string.IsNullOrEmpty(edbRadText.Text))
                         {
-                            oGarp.InsertOrderText(255, edbRadText.Text);
+                            MessageBox.Show("A1 " + edbRadText.Text + " " + oKOTxtReg.Fields.Item("ONR").Value);
+                            //oGarp.InsertOrderText(255, edbRadText.Text);
+                            oKOTxtReg.Insert();
+                            oKOTxtReg.Fields.Item("ONR").Value = sOrderNr;
+                            oKOTxtReg.Fields.Item("RDC").Value = iOrderRadNr.ToString("D3");
+                            oKOTxtReg.Fields.Item("SQC").Value = "255";
+                            oKOTxtReg.Fields.Item("TX1").Value = edbRadText.Text;
+                            oKOTxtReg.Fields.Item("OBF").Value = "1";
+                            oKOTxtReg.Fields.Item("PLF").Value = "1";
+                            oKOTxtReg.Fields.Item("FSF").Value = "1";
+                            oKOTxtReg.Fields.Item("FAF").Value = "1";
+                            //oKOTxtReg.Fields.Item("OSE").Value = "K";
+                            //oKOTxtReg.Fields.Item("RCT").Value = "K";
+
+                            //oKOTxtSekvNr.Value = "255";
+                            oKOTxtReg.Post();
                             edbRadText.Text = string.Empty;
                             edbRadText.SetFocus();
                         }
@@ -620,7 +638,7 @@ namespace SaljPartOrderForms
                                     CompareDates(aoTabTxt[1].Value.Substring(19, 6).Trim(),CompOrder.Item("ogrLdtMcEdit").Text,"gte"))
                                 {
                                     LäsInRabattBaser(iRabTyp); // Subanrop
-                                      LäsInRabattTyper(iRabTyp); // Subanrop
+                                    LäsInRabattTyper(iRabTyp); // Subanrop
                                 }
                             }
                         }
@@ -670,7 +688,7 @@ namespace SaljPartOrderForms
             decimal cAntal;
 
             cAntal = Convert.ToDecimal(CompOrder.Item("ogrOraMcEdit").Text.Replace(".", ","));
-
+           
             switch (iRabTyp)
             {
                 case 0: // Pallrabatt
@@ -689,13 +707,14 @@ namespace SaljPartOrderForms
                             cPallRab = cPallRab * Convert.ToDecimal(aoTabNum[1].Value); // Vägd rabatt
                             edbPallRab.Text = (cPallRab / 100).ToString("0.00").Replace(",", ".");
                         }
-                        edbPallRab.Text = edbPallRab.Text.PadLeft(15); // Centrera värdet
+                        edbPallRab.Text = edbPallRab.Text; // Centrera värdet
                     }
                     else
                     {
                         edbPallRab.Text = "0.00"; // Nollrabatt
                     }
-                    edbPallRab.Text = edbPallRab.Text.PadLeft(15); // Centrera värdet
+
+                    edbPallRab.Text = edbPallRab.Text.PadLeft(10); // Centrera värdet
                     break;
                 case 1: // Kvant-/Hämtrabatt
                     for (iX = 5; iX >= 1; iX--)
@@ -713,11 +732,11 @@ namespace SaljPartOrderForms
                             edbKvantRab.Text = "0.00"; // Nollrabatt
                         }
                     }
-                    edbKvantRab.Text = edbKvantRab.Text.PadLeft(15); // Centrera värdet
+                    edbKvantRab.Text = edbKvantRab.Text.PadLeft(10); // Centrera värdet
                     break;
                 case 2: // Avtalsrabatt
                     edbAvtalsRab.Text = (Convert.ToDecimal(aoTabNum[1].Value) / 100).ToString("0.00").Replace(",", ".");
-                    edbAvtalsRab.Text = edbAvtalsRab.Text.PadLeft(15); // Centrera värdet
+                    edbAvtalsRab.Text = edbAvtalsRab.Text.PadLeft(10); // Centrera värdet
                     break;
                 case 3: // Aktivitetsrabatt
                     for (iX = 5; iX >= 1; iX--)
@@ -735,11 +754,11 @@ namespace SaljPartOrderForms
                             edbAktRab.Text = "0.00"; // Nollrabatt
                         }
                     }
-                    edbAktRab.Text = edbAktRab.Text.PadLeft(15); // Centrera värdet
+                    edbAktRab.Text = edbAktRab.Text.PadLeft(10); // Centrera värdet
                     break;
                 case 4: // Kundrabatt
                     edbKundRab.Text = (Convert.ToDecimal(aoTabNum[1].Value) / 100).ToString("0.00").Replace(",", ".");
-                    edbKundRab.Text = edbKundRab.Text.PadLeft(15); // Centrera värdet
+                    edbKundRab.Text = edbKundRab.Text.PadLeft(10); // Centrera värdet
                     break;
             }
         }
@@ -748,11 +767,11 @@ namespace SaljPartOrderForms
 
         private void NollaRabatter()
         {
-            edbPallRab.Text = "0.00".PadLeft(15);
-            edbKvantRab.Text = "0.00".PadLeft(15);
-            edbAvtalsRab.Text = "0.00".PadLeft(15);
-            edbAktRab.Text = "0.00".PadLeft(15);
-            edbKundRab.Text = "0.00".PadLeft(15);
+            edbPallRab.Text = "0.00".PadLeft(10);
+            edbKvantRab.Text = "0.00".PadLeft(10);
+            edbAvtalsRab.Text = "0.00".PadLeft(10);
+            edbAktRab.Text = "0.00".PadLeft(10);
+            edbKundRab.Text = "0.00".PadLeft(10);
         }
 
         private void LäsInRabattBen() // Anropas från: LäsInRabatter
@@ -867,7 +886,6 @@ namespace SaljPartOrderForms
 
                 CompOrder.Item("nettoprisLabel").Text = cNettoBel.ToString("#0.00").Replace(",", ".");
 
-
                 // Om 0 i pris
                 cNettoBel -= decimal.Parse(CompOrder.Item("ogrLVPMcEdit").Text.Replace(".", ","));
                 cNettoBel = cNettoBel / decimal.Parse(CompOrder.Item("ogrPriMcEdit").Text.Replace(".", ",")) * 100; // TB / Nettopris = TG
@@ -887,21 +905,29 @@ namespace SaljPartOrderForms
         {
             try
             {
-                debugg("RaderaRabattTexter Find: " + sOrderNr + iOrderRadNr.ToString("D3") + "  0");
+                //MessageBox.Show("RaderaRabattTexter: " + sOrderNr + iOrderRadNr.ToString("D3") + "  0");
                 oKOTxtReg.Find(sOrderNr + iOrderRadNr.ToString("D3") + "  0"); // Set pointer before 1st text
+                oKOTxtReg.Next();
                 do
                 {
                     debugg("oKoTxtOrderNr.Value: " + oKoTxtOrderNr.Value + "-" + sOrderNr);
-                    //MessageBox.Show("oKOTxtRadNr.Value: " + oKOTxtRadNr.Value + "-" + iOrderRadNr.ToString());
+                    //MessageBox.Show(string.IsNullOrEmpty(oKOTxtRadNr.Value).ToString());
+                    if (!string.IsNullOrEmpty(oKOTxtRadNr.Value))
+                    {
+                        //MessageBox.Show("oKOTxtRadNr.Value: " + oKOTxtRadNr.Value.Trim().PadLeft(3, '0') + " " + oKOTxtReg.Fields.Item("RDC").Value + "-" + iOrderRadNr.ToString().PadLeft(3, '0'));
+                    }
+
                     debugg("oKOTxt.Value: " + oKOTxt.Value);
 
-                    if (oKoTxtOrderNr.Value == sOrderNr && !string.IsNullOrEmpty(oKOTxtRadNr.Value) && Convert.ToInt32(oKOTxtRadNr.Value) == iOrderRadNr) //TODO osäker på om oKOTxtRadNr.Value & iOrderRadNr har samma format här
+                    if (oKoTxtOrderNr.Value == sOrderNr && !string.IsNullOrEmpty(oKOTxtRadNr.Value) && oKOTxtRadNr.Value.Trim().PadLeft(3,'0') == iOrderRadNr.ToString().PadLeft(3,'0')) //TODO osäker på om oKOTxtRadNr.Value & iOrderRadNr har samma format här
                     {
                         debugg("oKOTxtFAFl.Value " + oKOTxtFAFl.Value);
                         if (oKOTxtFAFl.Value == "R")
                         {
+                            //MessageBox.Show("Radera " + oKOTxtReg.Fields.Item("RDC").Value + " " + oKOTxt.Value);
                             oKOTxtReg.Delete(); // Delete all discount texts
                             oKOTxtReg.Prior();
+                            //MessageBox.Show("Står på  " + oKOTxtReg.Fields.Item("RDC").Value + " " + oKOTxt.Value);
                         }
                     }
                     else
@@ -1040,28 +1066,12 @@ namespace SaljPartOrderForms
                     //MessageBox.Show("on_AfterScrollOrderRow iLevFlagga: " + iLevFlagga);
                     //MessageBox.Show(string.IsNullOrEmpty(sOrderNr).ToString());
                     //sOrderNr is not blank if we scrolled from a row which was a rabattrow so save orderrowtext
-                    if (false && !string.IsNullOrEmpty(sOrderNr) && iLevFlagga < 5)
-                    {
-                        debugg("on_AfterScrollOrderRow sOrderNr: " + sOrderNr);
 
-                        RaderaRabattTexter();
-                        debugg("EEE");
-                        //MessageBox.Show("edbBruttoPris.Text: " + edbBruttoPris.Text);
-                        if (edbBruttoPris.Text != "" && decimal.Parse(edbBruttoPris.Text.Replace(".",",")) != 0)
-                        {
-                            LäggUppRabattTexter();
-                            if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim())
-                            {
-                                MessageBox.Show("Kolla rabatten. Kan vara dubbelräknad.", "Varning!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                            }
-                        }
-                    }
-
-                    if (!checkNewRow())
+                    if (checkNewRow())
                     {
-                        //MessageBox.Show("new row");
-                        
-                        if (oArtReg.Find(CompOrder.Item("ogrAnrMcEdit").Text) && Convert.ToInt32(CompOrder.Item("ogrLvfMcedit").Text.Substring(0, 1)) < 5)
+                        //MessageBox.Show(CompOrder.Item("ogrAnrMcEdit").Text);
+
+                        if (oArtReg.Find(CompOrder.Item("ogrAnrMcEdit").Text) && Convert.ToInt32(CompOrder.Item("ogrLvfMcedit").Text.Substring(0, 1)) < 5)                      
                         {
                             if (oArtReg.Fields.Item("KD1").Value == "R")
                             {
@@ -1108,12 +1118,17 @@ namespace SaljPartOrderForms
         {
             try
             {
-                //then, save some data!
-                string savedRowNo = currentRowNo;
                 currentRowNo = dsOGR.Fields.Item("RDC").Value;
-
-                return (savedRowNo != currentRowNo);
-
+                if (currentRowNo != savedRowNo)
+                {
+                    savedRowNo = currentRowNo;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+ 
             }
             catch (Exception e)
             {

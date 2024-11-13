@@ -32,7 +32,7 @@ namespace SaljPartOrderForms
         private Garp.IComponent edbBruttoPris, edbPallRab, edbKvantRab, edbAvtalsRab, edbAktRab, edbKundRab, edbProvision, edbRadText, edbRabattUtr;
         private Garp.IComponent lblPallRab, lblKvantRab, lblAvtalsRab, lblAktRab, lblKundRab, lblRabattUtr, lblProvision;
         private string[,] asRabattBas = new string[5, 3];
-        private string sOrderNr = "", currentRowNo;
+        private string sOrderNr = "";
         private int iOrderRadNr;
         private int iLevFlagga = -1;
         private bool bFelkod;
@@ -41,6 +41,7 @@ namespace SaljPartOrderForms
 
         private bool blndebugg = false;
         private string savedRowNo = "";
+        private string currentRowNo = "";
 
 
         public Order()
@@ -49,12 +50,12 @@ namespace SaljPartOrderForms
             {
                 oGarp = new Garp.Application();
                 CompOrder = oGarp.Components;
-                //dsOGA = oGarp.Datasets.Item("ogrMcDataSet");
+                dsOGA = oGarp.Datasets.Item("ogaMcDataSet");
                 dsOGR = oGarp.Datasets.Item("ogrMcDataSet");
                 InitTablesAndFields();
 
                 //dsOGR.BeforePost += on_BeforePostOrderRow;
-                //dsOGA.AfterScroll += on_AfterScrollOrder;
+                dsOGA.AfterScroll += on_AfterScrollOrder;
                 dsOGR.AfterScroll += on_AfterScrollOrderRow;
 
             }
@@ -109,6 +110,7 @@ namespace SaljPartOrderForms
     { 
         try
         {
+
                 CompOrder.Item("vrabattGroupBox").Visible = true;
                 CompOrder.Item("prisinfoBitBtn").Visible = true;
                 CompOrder.Item("mceOgrREV").Visible = true;
@@ -273,23 +275,21 @@ namespace SaljPartOrderForms
         {
             try
             { 
-            string sDatum;
+                string sDatum;
 
-                while (string.IsNullOrEmpty(CompOrder.Item("ogaBltMcEdit").Text))
+                if (string.IsNullOrEmpty(CompOrder.Item("ogaBltMcEdit").Text) && string.IsNullOrEmpty(CompOrder.Item("ogrLdtMcEdit").Text)) // If delivery date is missing
                 {
-                    if (string.IsNullOrEmpty(CompOrder.Item("ogrLdtMcEdit").Text)) // If delivery date is missing
-                    {
-                        inputdate levdate = new inputdate();
-                        levdate.ShowDialog();
+                    inputdate levdate = new inputdate();
+                    levdate.ShowDialog();
+                    sDatum = levdate.TheDate;
+                    //MessageBox.Show(sDatum);
 
-                        sDatum = levdate.TheDate;
-                       
-                        CompOrder.Item("ogaBltMcEdit").Text = sDatum;
-                        CompOrder.Item("ogrLdtMcEdit").Text = sDatum;
-                        CompOrder.Item("ogrOraMcEdit").SetFocus();
-                        System.Threading.Thread.Sleep(1000);
-                    }
+                    CompOrder.Item("ogaBltMcEdit").Text = sDatum;
+                    CompOrder.Item("ogrLdtMcEdit").Text = sDatum;
+                    CompOrder.Item("ogrOraMcEdit").SetFocus();
+                    System.Threading.Thread.Sleep(100);
                 }
+
             }
             catch (Exception ex)
             {
@@ -909,19 +909,15 @@ namespace SaljPartOrderForms
                 oKOTxtReg.Find(sOrderNr + iOrderRadNr.ToString("D3") + "  0"); // Set pointer before 1st text
                 oKOTxtReg.Next();
                 do
-                {
-                    debugg("oKoTxtOrderNr.Value: " + oKoTxtOrderNr.Value + "-" + sOrderNr);
+                {          
                     //MessageBox.Show(string.IsNullOrEmpty(oKOTxtRadNr.Value).ToString());
                     if (!string.IsNullOrEmpty(oKOTxtRadNr.Value))
                     {
                         //MessageBox.Show("oKOTxtRadNr.Value: " + oKOTxtRadNr.Value.Trim().PadLeft(3, '0') + " " + oKOTxtReg.Fields.Item("RDC").Value + "-" + iOrderRadNr.ToString().PadLeft(3, '0'));
                     }
 
-                    debugg("oKOTxt.Value: " + oKOTxt.Value);
-
-                    if (oKoTxtOrderNr.Value == sOrderNr && !string.IsNullOrEmpty(oKOTxtRadNr.Value) && oKOTxtRadNr.Value.Trim().PadLeft(3,'0') == iOrderRadNr.ToString().PadLeft(3,'0')) //TODO osäker på om oKOTxtRadNr.Value & iOrderRadNr har samma format här
+                     if (oKoTxtOrderNr.Value == sOrderNr && !string.IsNullOrEmpty(oKOTxtRadNr.Value) && oKOTxtRadNr.Value.Trim().PadLeft(3,'0') == iOrderRadNr.ToString().PadLeft(3,'0')) //TODO osäker på om oKOTxtRadNr.Value & iOrderRadNr har samma format här
                     {
-                        debugg("oKOTxtFAFl.Value " + oKOTxtFAFl.Value);
                         if (oKOTxtFAFl.Value == "R")
                         {
                             //MessageBox.Show("Radera " + oKOTxtReg.Fields.Item("RDC").Value + " " + oKOTxt.Value);
@@ -932,16 +928,12 @@ namespace SaljPartOrderForms
                     }
                     else
                     {
-                        debugg("No match on row " + oKOTxtRadNr.Value);
                         if (!string.IsNullOrEmpty(oKoTxtOrderNr.Value) && !string.IsNullOrEmpty(oKOTxtRadNr.Value))
                         {
-                            debugg("break");
                             break;
                         }
                     }
-                    debugg("FÖRE NEXT oKOTxtRadNr.Value: " + oKOTxtRadNr.Value);
                     oKOTxtReg.Next();
-                    debugg("EFTER NEXT oKOTxtRadNr.Value: " + oKOTxtRadNr.Value);
                 } while (!oKOTxtReg.Eof);
     
             }
@@ -962,7 +954,6 @@ namespace SaljPartOrderForms
                 //MessageBox.Show("LäggUppRabattTexter onr: " + sOrderNr + " -" + iOrderRadNr);
                 for (int iX = 0; iX <= 4; iX++) // Log texts
                 {
-                    debugg("iX: " + iX);
                     string sStr = string.Empty;
                     switch (iX)
                     {
@@ -1004,8 +995,6 @@ namespace SaljPartOrderForms
                     }
                     if (!string.IsNullOrEmpty(sStr))
                     {
-                        debugg("LäggUppRabattTexter sStr: " + sStr + "-" + sOrderNr);
-
                         //oKOTxtReg.Find(sOrderNr + iOrderRadNr.ToString("D3") + "  0"); // Set pointer before 1st text
 
                         oKOTxtReg.Insert();
@@ -1043,13 +1032,14 @@ namespace SaljPartOrderForms
             {
                 try
                 {
-                    debugg("on_AfterScrollOrder");
-                    sOrderNr = CompOrder.Item("onrEdit").Text;
+                    //sOrderNr = CompOrder.Item("onrEdit").Text;
+                    InitForNoRabatt();
+                    savedRowNo = "";
                 }
                 catch (Exception ex)
                 {
                     // Handle exception if needed
-                    MessageBox.Show("on_AfterScrollOrderRow " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show("on_AfterScrollOrder " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
 
             }
@@ -1061,16 +1051,17 @@ namespace SaljPartOrderForms
             {
                 try
                 {
-                    //MessageBox.Show("AA");
+                    //MessageBox.Show("on_AfterScrollOrderRow");
                     //MessageBox.Show("on_AfterScrollOrderRow sOrderNr: " + sOrderNr);
                     //MessageBox.Show("on_AfterScrollOrderRow iLevFlagga: " + iLevFlagga);
                     //MessageBox.Show(string.IsNullOrEmpty(sOrderNr).ToString());
                     //sOrderNr is not blank if we scrolled from a row which was a rabattrow so save orderrowtext
+                    
 
                     if (checkNewRow())
                     {
                         //MessageBox.Show(CompOrder.Item("ogrAnrMcEdit").Text);
-
+                        //MessageBox.Show("newrow");
                         if (oArtReg.Find(CompOrder.Item("ogrAnrMcEdit").Text) && Convert.ToInt32(CompOrder.Item("ogrLvfMcedit").Text.Substring(0, 1)) < 5)                      
                         {
                             if (oArtReg.Fields.Item("KD1").Value == "R")
@@ -1081,10 +1072,11 @@ namespace SaljPartOrderForms
 
                                 if (!string.IsNullOrEmpty(sOrderNr) && iLevFlagga < 5)
                                 {
+                                    //MessageBox.Show("radera texter " + CompOrder.Item("ogrAnrMcEdit").Text);
                                     RaderaRabattTexter();
-                                    debugg("edbBruttoPris.Text: " + edbBruttoPris.Text);
                                     if (edbBruttoPris.Text != "" && decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
                                     {
+                                        //MessageBox.Show("lägg till texter " + CompOrder.Item("ogrAnrMcEdit").Text);
                                         LäggUppRabattTexter();
                                         if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim())
                                         {
@@ -1093,7 +1085,8 @@ namespace SaljPartOrderForms
                                     }
                                 }
                             }
-                            else {
+                            else
+                            {
                                 //MessageBox.Show("IN-AKTIVERA rabatthanteringenA " + CompOrder.Item("ogrAnrMcEdit").Text);
                                 InitForNoRabatt();
                             }
@@ -1118,25 +1111,59 @@ namespace SaljPartOrderForms
         {
             try
             {
+                string anr = CompOrder.Item("ogrAnrMcEdit").Text;
                 currentRowNo = dsOGR.Fields.Item("RDC").Value;
-                if (currentRowNo != savedRowNo)
+
+                //MessageBox.Show(currentRowNo + "  " + savedRowNo);
+                if (!string.IsNullOrEmpty(anr) && (currentRowNo != savedRowNo || savedRowNo==""))
                 {
                     savedRowNo = currentRowNo;
+                    //MessageBox.Show("true");
                     return true;
                 }
                 else
                 {
+                    //MessageBox.Show("false " + currentRowNo + " A " + savedRowNo);
                     return false;
                 }
  
             }
             catch (Exception e)
             {
+                //MessageBox.Show("checkNewRow Exception");
                 return false;
             }
         }
 
 
+        private bool checkNewRow2()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(dsOGR.Fields.Item("RDC").Value))
+                {
+                    MessageBox.Show("checkNewRow2 RDC");
+                    return false;
+                }
+                //then, save some data!
+                string savedRowNo2 = currentRowNo;
+                currentRowNo = dsOGR.Fields.Item("RDC").Value;
+
+                if (savedRowNo2 != currentRowNo)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("checkNewRow2 Exception");
+                return false;
+            }
+        }
 
         //Informat yymmdd
         private bool CompareDates(string indate1, string indate2, string comp)
@@ -1159,7 +1186,7 @@ namespace SaljPartOrderForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("CompareDates " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("CompareDates " + ex.Message + " " + indate1 + " " + indate2, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return false;
             }
         }
@@ -1188,7 +1215,7 @@ namespace SaljPartOrderForms
                             oGarp.FieldExit -= FieldExit;
                             oGarp.FieldEnter -= FieldEnter;
 
-                           //dsOGA.AfterScroll -= on_AfterScrollOrder;
+                            dsOGA.AfterScroll -= on_AfterScrollOrder;
                             dsOGR.AfterScroll -= on_AfterScrollOrderRow;
 
                             //System.Runtime.InteropServices.Marshal.ReleaseComObject(dsOGA);

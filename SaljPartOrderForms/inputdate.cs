@@ -23,13 +23,26 @@ namespace SaljPartOrderForms
         public inputdate()
         {
             InitializeComponent();
+            dtLevdate.Focus();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            TheDate = txtDate.Text;
-            DialogResult = DialogResult.OK;
-            this.Close();
+            TheDate = dtLevdate.Text;
+            if (!string.IsNullOrEmpty(TheDate)){
+                DialogResult = DialogResult.OK;
+                this.Close();
+            }
+        }
+
+
+        private void txtDate_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                button1_Click(null,null);
+                e.Handled = true; //Handle the Keypress event (suppress the Beep)
+            }
         }
     }
 }

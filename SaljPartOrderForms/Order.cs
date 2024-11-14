@@ -42,7 +42,7 @@ namespace SaljPartOrderForms
         private bool blndebugg = false;
         private string savedRowNo = "";
         private string currentRowNo = "";
-
+        private bool haschangedprice = false;
 
         public Order()
         {
@@ -522,7 +522,7 @@ namespace SaljPartOrderForms
                                 BeräknaNetto(); // Subanrop
                                 break;
                             case "edbBruttoPris":
-                                if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim())
+                                if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim() && !haschangedprice)
                                 {
                                     sPrisfråga = MessageBox.Show("Vill du verkligen ändra priset?", "Fråga?", MessageBoxButtons.YesNo, MessageBoxIcon.Question).ToString();
                                     if (sPrisfråga == "Yes")
@@ -532,6 +532,7 @@ namespace SaljPartOrderForms
                                         CompOrder.Item("ogrNX1McEdit").Text = (decimal.Parse(edbBruttoPris.Text) * 100).ToString().Replace(",", ".");
                                         edbBruttoPris.Text = edbBruttoPris.Text.Trim().Replace(",", ".");
                                         edbBruttoPris.Text = edbBruttoPris.Text; //TODO Format(edbBruttoPris.Text, "@@@@@@@@@");
+                                        haschangedprice = true;
                                     }
                                     else if (sPrisfråga == "No")
                                     {
@@ -1056,7 +1057,7 @@ namespace SaljPartOrderForms
                     //MessageBox.Show("on_AfterScrollOrderRow iLevFlagga: " + iLevFlagga);
                     //MessageBox.Show(string.IsNullOrEmpty(sOrderNr).ToString());
                     //sOrderNr is not blank if we scrolled from a row which was a rabattrow so save orderrowtext
-                    
+                    haschangedprice = false;
 
                     if (checkNewRow())
                     {

@@ -30,7 +30,7 @@ namespace SaljPartOrderForms
         private Garp.ITabField oKOHResKod, oKORadResKod;
         private Garp.ITable oKOTxtReg, oKORadReg;
         private Garp.IComponent edbBruttoPris, edbPallRab, edbKvantRab, edbAvtalsRab, edbAktRab, edbKundRab, edbProvision, edbRadText, edbRabattUtr;
-        private Garp.IComponent lblPallRab, lblKvantRab, lblAvtalsRab, lblAktRab, lblKundRab, lblRabattUtr, lblProvision;
+        private Garp.IComponent lblPallRab, lblKvantRab, lblAvtalsRab, lblAktRab, lblKundRab, lblRabattUtr, lblProvision, LblVersioning;
         private string[,] asRabattBas = new string[5, 3];
         private string sOrderNr = "";
         private int iOrderRadNr;
@@ -97,6 +97,15 @@ namespace SaljPartOrderForms
             oKOTxtFSFl = oKOTxtReg.Fields.Item("FSF");
             oKOTxtFAFl = oKOTxtReg.Fields.Item("FAF");
 
+            // Orderhuvudfliken
+            CompOrder.BaseComponent = "Tabsheet1";
+            int rowSpacing = 18;
+            int top = CompOrder.Item("ogfTx2McEdit").Top + rowSpacing * 2;
+            int left = 15;
+            LblVersioning = CompOrder.AddLabel("LblVersioning");
+            LblVersioning.Top = top;
+            LblVersioning.Left = left;
+            LblVersioning.Text = "Forms Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         }
         catch (Exception ex)
@@ -434,29 +443,56 @@ namespace SaljPartOrderForms
             if (oArtReg.Find(sArtNr))
             {
                 sUrsprPris = oArtPris.Value;
+                //MessageBox.Show("Z1 " + sUrsprPris);
                 if (edbBruttoPris.Text !="" && decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
                 {
+                    //MessageBox.Show("Z2 " + sUrsprPris);
                     edbBruttoPris.Text = sUrsprPris.ToString();
                 }
                 else
                 {
+                    //MessageBox.Show("Z3 " + edbBruttoPris.Text);
                     CompOrder.Item("ogrPriMcEdit").Text = edbBruttoPris.Text;
                 }
             }
 
             NX1Pris = decimal.Parse(CompOrder.Item("ogrNX1McEdit").Text.Replace(".", ","));
 
-            if (CompOrder.Item("ogrNX1McEdit").Text == "0")
+            if (isPriceZero(CompOrder.Item("ogrNX1McEdit").Text))
             {
                 NX1Pris = decimal.Parse(CompOrder.Item("edbBruttoPris").Text.Replace(".", ",")) * 100;
                 CompOrder.Item("ogrNX1McEdit").Text = NX1Pris.ToString().Replace(",", ".");
+                //MessageBox.Show("Z4 " + NX1Pris);
             }
-            else if (CompOrder.Item("ogrNX1McEdit").Text != "0")
+            else
             {
                 edbBruttoPris.Text = (NX1Pris / 100).ToString("#0.00").Replace(",", ".");
                 edbBruttoPris.Text = edbBruttoPris.Text; //TODO Format(edbBruttoPris.Text, "@@@@@@@@@");
+                //MessageBox.Show("Z5 " + edbBruttoPris.Text);
             }
         }
+
+        //kan vara 0 0.0 0.00 0.000 beroende av antal decimaler på artikeln
+        private bool isPriceZero(string ogrnx1)
+        {
+            try
+            {
+                if (Convert.ToInt32(ogrnx1) == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return true;
+            }
+        }
+
 
         private void FieldEnter()
         {
@@ -589,8 +625,9 @@ namespace SaljPartOrderForms
 
         private void LoggaAntalsÄndringar() // Tillägg 170213 för Axfood. Logg av ändringar.
         {
-            try { 
-                if (decimal.Parse(CompOrder.Item("ogrOraMcEdit").Text) != cUrsprAntal) // Om antal ändrats
+            try {
+
+                if (decimal.Parse(CompOrder.Item("ogrOraMcEdit").Text.Replace(".",",")) != cUrsprAntal) // Om antal ändrats
                 {
                     if (oKundReg.Find(CompOrder.Item("knrEdit").Text))
                     {
@@ -827,11 +864,16 @@ namespace SaljPartOrderForms
             MessageBox.Show(asRabattBas[3, 2]);
             MessageBox.Show(asRabattBas[4, 2]);
             */
+            string tmp = "a";
+
+            //MessageBox.Show(" C " + CompOrder.Item("ogrPriMcEdit").Text);
 
             try
             {
                 // Replace '.' with ',' in the input and parse it as decimal
                 cNettoBel = decimal.Parse(edbBruttoPris.Text.Replace(".", ","));
+
+                tmp = "b";
 
                 if (asRabattBas[0, 2] == "kr") // Beloppsrabatt
                 {
@@ -842,6 +884,7 @@ namespace SaljPartOrderForms
                     cNettoBel *= (1 + (decimal.Parse(edbPallRab.Text.Replace(".", ",")) / 100));
                 }
 
+                tmp = "c";
                 if (asRabattBas[1, 2] == "kr") // Beloppsrabatt
                 {
                     cNettoBel += decimal.Parse(edbKvantRab.Text.Replace(".", ","));
@@ -851,6 +894,7 @@ namespace SaljPartOrderForms
                     cNettoBel *= (1 + (decimal.Parse(edbKvantRab.Text.Replace(".", ",")) / 100));
                 }
 
+                tmp = "d";
                 if (asRabattBas[2, 2] == "kr") // Beloppsrabatt
                 {
                     cNettoBel += decimal.Parse(edbAvtalsRab.Text.Replace(".", ","));
@@ -860,7 +904,7 @@ namespace SaljPartOrderForms
                     cNettoBel *= (1 + (decimal.Parse(edbAvtalsRab.Text.Replace(".", ",")) / 100));
                 }
 
-                   
+                tmp = "e";
                 if (asRabattBas[3, 2] == "kr") // Beloppsrabatt
                 {
                     cNettoBel += decimal.Parse(edbAktRab.Text.Replace(".", ","));
@@ -877,7 +921,7 @@ namespace SaljPartOrderForms
                 {
                     cNettoBel *= (1 + (decimal.Parse(edbKundRab.Text.Replace(".", ",")) / 100));
                 }
-
+                tmp = "f";
                 cNettoBel = Math.Round(cNettoBel, 2);
     
                 if (decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
@@ -887,15 +931,20 @@ namespace SaljPartOrderForms
 
                 CompOrder.Item("nettoprisLabel").Text = cNettoBel.ToString("#0.00").Replace(",", ".");
 
+                tmp = "g";
+                //MessageBox.Show(" A " + CompOrder.Item("ogrLVPMcEdit").Text);
                 // Om 0 i pris
                 cNettoBel -= decimal.Parse(CompOrder.Item("ogrLVPMcEdit").Text.Replace(".", ","));
+                //MessageBox.Show(" B " + cNettoBel.ToString());
+                //MessageBox.Show(" C " + CompOrder.Item("ogrPriMcEdit").Text);
                 cNettoBel = cNettoBel / decimal.Parse(CompOrder.Item("ogrPriMcEdit").Text.Replace(".", ",")) * 100; // TB / Nettopris = TG
                 CompOrder.Item("nettoTbLabel").Text = cNettoBel.ToString("#0.00").Replace(",", "."); // TG
+                tmp = "h";
             }
             catch(Exception ex)
             {
                 // Handle exception if needed
-                MessageBox.Show("BeräknaNetto " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                //MessageBox.Show("BeräknaNetto " + ex.Message + " " + tmp, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 

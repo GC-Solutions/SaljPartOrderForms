@@ -651,71 +651,115 @@ namespace SaljPartOrderForms
 
         private void LäsInRabatter()
         {
-            string sNyckel = string.Empty;
-            int iAvtal;
-            int iRabTyp;
-            int iPrisAlt;
-            NollaRabatter(); // Subanrop
-            LäsInRabattBen(); // Subanrop
-            for (iAvtal = 1; iAvtal <= 2; iAvtal++)
+            int a = 0;
+
+            try
             {
-                for (iRabTyp = 0; iRabTyp <= 4; iRabTyp++) // Rabattyper
+                string sNyckel = string.Empty;
+                int iAvtal;
+                int iRabTyp;
+                int iPrisAlt;
+                NollaRabatter(); // Subanrop
+                a = 1;
+                LäsInRabattBen(); // Subanrop
+                a = 2;
+                for (iAvtal = 1; iAvtal <= 2; iAvtal++)
                 {
-                    SkapaTabNyckel(ref sNyckel, iAvtal, iRabTyp); // Subanrop
-                    for (iPrisAlt = 5; iPrisAlt >= 0; iPrisAlt--) // Prisalternativ
+                    a = 3;
+                    for (iRabTyp = 0; iRabTyp <= 4; iRabTyp++) // Rabattyper
                     {
-
-                        sNyckel = sNyckel.Substring(0, 9) + iPrisAlt.ToString();
-                        if (oTabReg.Find(sNyckel))
+                        a = 4;
+                        SkapaTabNyckel(ref sNyckel, iAvtal, iRabTyp); // Subanrop
+                        a = 5;
+                        for (iPrisAlt = 5; iPrisAlt >= 0; iPrisAlt--) // Prisalternativ
                         {
-
-                            if (string.IsNullOrWhiteSpace(aoTabTxt[1].Value.Substring(13, 6)) ||
-                                CompareDates(aoTabTxt[1].Value.Substring(13, 6).Trim(), CompOrder.Item("ogrLdtMcEdit").Text,"lte"))
+                            a = 6;
+                            if (sNyckel.Length >= 9)
                             {
-                                if (string.IsNullOrWhiteSpace(aoTabTxt[1].Value.Substring(19, 6)) ||
-                                    CompareDates(aoTabTxt[1].Value.Substring(19, 6).Trim(),CompOrder.Item("ogrLdtMcEdit").Text,"gte"))
+                                sNyckel = sNyckel.Substring(0, 9) + iPrisAlt.ToString();
+                                if (oTabReg.Find(sNyckel))
                                 {
-                                    LäsInRabattBaser(iRabTyp); // Subanrop
-                                    LäsInRabattTyper(iRabTyp); // Subanrop
+                                    a = 7;
+                                    if (string.IsNullOrWhiteSpace(aoTabTxt[1].Value.Substring(13, 6)) ||
+                                        CompareDates(aoTabTxt[1].Value.Substring(13, 6).Trim(), CompOrder.Item("ogrLdtMcEdit").Text, "lte"))
+                                    {
+                                        a = 8;
+                                        if (string.IsNullOrWhiteSpace(aoTabTxt[1].Value.Substring(19, 6)) ||
+                                            CompareDates(aoTabTxt[1].Value.Substring(19, 6).Trim(), CompOrder.Item("ogrLdtMcEdit").Text, "gte"))
+                                        {
+                                            a = 9;
+                                            LäsInRabattBaser(iRabTyp); // Subanrop
+                                            a = 10;
+                                            LäsInRabattTyper(iRabTyp); // Subanrop
+                                            a = 11;
+                                        }
+                                    }
                                 }
+
                             }
                         }
                     }
                 }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("LäsInRabatter " + ex.Message + " " + a, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
 
 
         private void SkapaTabNyckel(ref string sNyckel, int iAvtal, int iRabTyp)
-        { 
-            sNyckel = "9";
+        {
+            int a = 0;
+
+            try
+            {
+
+                sNyckel = "9";
 
             if (iRabTyp > 0) // > Pallrabatt
             {
                 if (iAvtal == 1)
                 {
-                    if (oKundReg.Find(CompOrder.Item("knrEdit").Text)) // Söker upp ev. avtalsnummer
+                        a = 1;
+                        if (oKundReg.Find(CompOrder.Item("knrEdit").Text)) // Söker upp ev. avtalsnummer
                     {
                         sNyckel += oAvtalNr.Value.ToString(); // Läser in avtalsnummer (num 1)
                     }
                 }
                 else if (iAvtal == 2)
                 {
-                    sNyckel += CompOrder.Item("knrEdit").Text.Substring(0, 4); // &Kundnummer 4 tkn
+                        a = 2;
+                        sNyckel += CompOrder.Item("knrEdit").Text.Substring(0, 4); // &Kundnummer 4 tkn
                 }
             }
-            sNyckel = sNyckel.PadRight(5); // Fyller ut till 1+4tkn (kundnummer)
+                a = 3;
+                sNyckel = sNyckel.PadRight(5); // Fyller ut till 1+4tkn (kundnummer)
 
             if (iRabTyp < 4) // < Kundrabatt
             {
-                if (oArtReg.Find(CompOrder.Item("ogrAnrMcEdit").Text))
+                    a = 4;
+                    if (oArtReg.Find(CompOrder.Item("ogrAnrMcEdit").Text))
                 {
-                    sNyckel += oArtNyckel.Value.ToString(); // Läser in artikelnyckel
-                }
+                        a = 5;
+                        //MessageBox.Show(oArtNyckel.Value.ToString());
+                        if (!string.IsNullOrEmpty(oArtNyckel.Value)) { 
+                            sNyckel += oArtNyckel.Value.ToString(); // Läser in artikelnyckel
+                        }
+                        //MessageBox.Show(sNyckel);
+                        a = 6;
+                    }
             }
 
             sNyckel = sNyckel.PadRight(8) + iRabTyp.ToString(); // Fyller ut till 8 tkn + rabattyp
+                a = 7;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("SkapaTabNyckel " + ex.Message + " " + a, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
 
 
@@ -1011,35 +1055,35 @@ namespace SaljPartOrderForms
                             if (edbPallRab.Text !="" && decimal.Parse(edbPallRab.Text.Replace(".", ",")) != 0)
                             {
                                 sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 16 - sStr.Length) + edbPallRab.Text + " " + asRabattBas[iX, 2];
+                                sStr += new string(' ', 15 - sStr.Length) + edbPallRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 1:
                             if (edbKvantRab.Text != "" && decimal.Parse(edbKvantRab.Text.Replace(".", ",")) != 0)
                             {
                                 sStr = asRabattBas[iX, 1].Substring(0, 14) + "."; // Discount type + % / kr
-                                sStr += new string(' ', 16 - sStr.Length) + edbKvantRab.Text + " " + asRabattBas[iX, 2];
+                                sStr += new string(' ', 15 - sStr.Length) + edbKvantRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 2:
                             if (edbAvtalsRab.Text != "" && decimal.Parse(edbAvtalsRab.Text.Replace(".", ",")) != 0)
                             {
                                 sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 16 - sStr.Length) + edbAvtalsRab.Text + " " + asRabattBas[iX, 2];
+                                sStr += new string(' ', 15 - sStr.Length) + edbAvtalsRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 3:
                             if (edbAktRab.Text != "" && decimal.Parse(edbAktRab.Text.Replace(".", ",")) != 0)
                             {
                                 sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 16 - sStr.Length) + edbAktRab.Text + " " + asRabattBas[iX, 2];
+                                sStr += new string(' ', 15 - sStr.Length) + edbAktRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 4:
                             if (edbKundRab.Text != "" && decimal.Parse(edbKundRab.Text.Replace(".", ",")) != 0)
                             {
                                 sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 16 - sStr.Length) + edbKundRab.Text + " " + asRabattBas[iX, 2];
+                                sStr += new string(' ', 15 - sStr.Length) + edbKundRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                     }

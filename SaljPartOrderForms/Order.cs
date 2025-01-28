@@ -592,7 +592,7 @@ namespace SaljPartOrderForms
 
                         if (!string.IsNullOrEmpty(edbRadText.Text))
                         {
-                            MessageBox.Show("A1 " + edbRadText.Text + " " + oKOTxtReg.Fields.Item("ONR").Value);
+                            //MessageBox.Show("A1 " + edbRadText.Text + " " + oKOTxtReg.Fields.Item("ONR").Value);
                             //oGarp.InsertOrderText(255, edbRadText.Text);
                             oKOTxtReg.Insert();
                             oKOTxtReg.Fields.Item("ONR").Value = sOrderNr;
@@ -755,10 +755,12 @@ namespace SaljPartOrderForms
 
             sNyckel = sNyckel.PadRight(8) + iRabTyp.ToString(); // Fyller ut till 8 tkn + rabattyp
                 a = 7;
+                //MessageBox.Show(sNyckel);
             }
+
             catch (Exception ex)
             {
-                MessageBox.Show("SkapaTabNyckel " + ex.Message + " " + a, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                //MessageBox.Show("SkapaTabNyckel " + ex.Message + " " + a, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
@@ -796,7 +798,7 @@ namespace SaljPartOrderForms
                         edbPallRab.Text = "0.00"; // Nollrabatt
                     }
 
-                    edbPallRab.Text = edbPallRab.Text.PadLeft(10); // Centrera värdet
+                    edbPallRab.Text = edbPallRab.Text.PadLeft(9); // Centrera värdet
                     break;
                 case 1: // Kvant-/Hämtrabatt
                     for (iX = 5; iX >= 1; iX--)
@@ -814,11 +816,11 @@ namespace SaljPartOrderForms
                             edbKvantRab.Text = "0.00"; // Nollrabatt
                         }
                     }
-                    edbKvantRab.Text = edbKvantRab.Text.PadLeft(10); // Centrera värdet
+                    edbKvantRab.Text = edbKvantRab.Text.PadLeft(9); // Centrera värdet
                     break;
                 case 2: // Avtalsrabatt
                     edbAvtalsRab.Text = (Convert.ToDecimal(aoTabNum[1].Value) / 100).ToString("0.00").Replace(",", ".");
-                    edbAvtalsRab.Text = edbAvtalsRab.Text.PadLeft(10); // Centrera värdet
+                    edbAvtalsRab.Text = edbAvtalsRab.Text.PadLeft(9); // Centrera värdet
                     break;
                 case 3: // Aktivitetsrabatt
                     for (iX = 5; iX >= 1; iX--)
@@ -836,11 +838,11 @@ namespace SaljPartOrderForms
                             edbAktRab.Text = "0.00"; // Nollrabatt
                         }
                     }
-                    edbAktRab.Text = edbAktRab.Text.PadLeft(10); // Centrera värdet
+                    edbAktRab.Text = edbAktRab.Text.PadLeft(9); // Centrera värdet
                     break;
                 case 4: // Kundrabatt
                     edbKundRab.Text = (Convert.ToDecimal(aoTabNum[1].Value) / 100).ToString("0.00").Replace(",", ".");
-                    edbKundRab.Text = edbKundRab.Text.PadLeft(10); // Centrera värdet
+                    edbKundRab.Text = edbKundRab.Text.PadLeft(9); // Centrera värdet
                     break;
             }
         }
@@ -1042,55 +1044,62 @@ namespace SaljPartOrderForms
 
         private void LäggUppRabattTexter() // Called from: Dispose
         {
+            string tmp = "a";
             try
             {
 
                 //MessageBox.Show("LäggUppRabattTexter onr: " + sOrderNr + " -" + iOrderRadNr);
                 for (int iX = 0; iX <= 4; iX++) // Log texts
                 {
+                    tmp = "b";
                     string sStr = string.Empty;
                     switch (iX)
                     {
                         case 0:
+                            tmp = "c";
                             if (edbPallRab.Text !="" && decimal.Parse(edbPallRab.Text.Replace(".", ",")) != 0)
                             {
-                                sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 15 - sStr.Length) + edbPallRab.Text + " " + asRabattBas[iX, 2];
+                                sStr = asRabattBas[iX, 1].PadRight(16, ' '); // Discount type + % / kr
+                                sStr += edbPallRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 1:
+                            tmp = "d";
                             if (edbKvantRab.Text != "" && decimal.Parse(edbKvantRab.Text.Replace(".", ",")) != 0)
                             {
-                                sStr = asRabattBas[iX, 1].Substring(0, 14) + "."; // Discount type + % / kr
-                                sStr += new string(' ', 15 - sStr.Length) + edbKvantRab.Text + " " + asRabattBas[iX, 2];
+                                sStr = (asRabattBas[iX, 1].Substring(0, 14) + ".").PadRight(16, ' '); // Discount type + % / kr
+                                sStr += edbKvantRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 2:
+                            tmp = "e";
                             if (edbAvtalsRab.Text != "" && decimal.Parse(edbAvtalsRab.Text.Replace(".", ",")) != 0)
                             {
-                                sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 15 - sStr.Length) + edbAvtalsRab.Text + " " + asRabattBas[iX, 2];
+                                sStr = asRabattBas[iX, 1].PadRight(16, ' '); // Discount type + % / kr
+                                sStr += edbAvtalsRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 3:
+                            tmp = "f";
                             if (edbAktRab.Text != "" && decimal.Parse(edbAktRab.Text.Replace(".", ",")) != 0)
                             {
-                                sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 15 - sStr.Length) + edbAktRab.Text + " " + asRabattBas[iX, 2];
+                                sStr = asRabattBas[iX, 1].PadRight(16, ' '); // Discount type + % / kr
+                                sStr += edbAktRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                         case 4:
+                            tmp = "g";
                             if (edbKundRab.Text != "" && decimal.Parse(edbKundRab.Text.Replace(".", ",")) != 0)
                             {
-                                sStr = asRabattBas[iX, 1]; // Discount type + % / kr
-                                sStr += new string(' ', 15 - sStr.Length) + edbKundRab.Text + " " + asRabattBas[iX, 2];
+                                sStr = asRabattBas[iX, 1].PadRight(16, ' '); // Discount type + % / kr
+                                sStr += edbKundRab.Text + " " + asRabattBas[iX, 2];
                             }
                             break;
                     }
                     if (!string.IsNullOrEmpty(sStr))
                     {
                         //oKOTxtReg.Find(sOrderNr + iOrderRadNr.ToString("D3") + "  0"); // Set pointer before 1st text
-
+                        tmp = "h";
                         oKOTxtReg.Insert();
 
                         oKoTxtOrderNr.Value = sOrderNr;
@@ -1109,13 +1118,13 @@ namespace SaljPartOrderForms
                     }
 
                 }
-
+                tmp = "i";
                 Array.Clear(asRabattBas, 0, asRabattBas.Length);
             }
             catch (Exception ex)
             {
                 // Handle exception if needed
-                MessageBox.Show("LäggUppRabattTexter " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                //MessageBox.Show("LäggUppRabattTexter " + ex.Message + " " + tmp, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 
@@ -1195,7 +1204,7 @@ namespace SaljPartOrderForms
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("on_AfterScrollOrderRow " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    //MessageBox.Show("on_AfterScrollOrderRow " + ex.Message, "Forms", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
         }

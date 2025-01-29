@@ -1321,8 +1321,9 @@ namespace SaljPartOrderForms
                             dsOGA.AfterScroll -= on_AfterScrollOrder;
                             dsOGR.AfterScroll -= on_AfterScrollOrderRow;
 
-                            //System.Runtime.InteropServices.Marshal.ReleaseComObject(dsOGA);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(dsOGA);
                             System.Runtime.InteropServices.Marshal.ReleaseComObject(dsOGR);
+                            System.Runtime.InteropServices.Marshal.ReleaseComObject(CompOrder);
                             System.Runtime.InteropServices.Marshal.ReleaseComObject(oGarp);
                         }
                     }

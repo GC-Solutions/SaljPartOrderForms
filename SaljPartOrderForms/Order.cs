@@ -251,7 +251,9 @@ namespace SaljPartOrderForms
                 DatumKontroll();
                 if (oArtReg.Find(CompOrder.Item("ogrAnrMcEdit").Text))
                 {
-                    CompOrder.Item("ogrKstMcEdit").Text = oArtKat.Value; // Cost center = ArtKat
+                    if (string.IsNullOrEmpty(CompOrder.Item("ogrKstMcEdit").Text)) { 
+                        CompOrder.Item("ogrKstMcEdit").Text = oArtKat.Value; // Cost center = ArtKat
+                    }
                     if (string.IsNullOrEmpty(CompOrder.Item("ogaSesMcEdit").Text))
                     {
                         CompOrder.Item("ogaSesMcEdit").Text = oArtLevNr.Value; // Sets supplier number in the season field

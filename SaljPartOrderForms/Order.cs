@@ -58,6 +58,9 @@ namespace SaljPartOrderForms
                 dsOGA.AfterScroll += on_AfterScrollOrder;
                 dsOGR.AfterScroll += on_AfterScrollOrderRow;
 
+                oGarp.FieldEnter += FieldEnter;
+                oGarp.FieldExit += FieldExit;
+
             }
             catch (Exception ex)
             {
@@ -235,8 +238,8 @@ namespace SaljPartOrderForms
                     a = 10;
                 }
                 //MessageBox.Show("FieldExit added " + iOrderRadNr);
-                oGarp.FieldEnter += FieldEnter;
-                oGarp.FieldExit += FieldExit;
+                //oGarp.FieldEnter += FieldEnter;
+                //oGarp.FieldExit += FieldExit;
             }
             catch (Exception ex)
             {

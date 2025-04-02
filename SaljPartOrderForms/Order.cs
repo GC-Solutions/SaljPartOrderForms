@@ -1181,10 +1181,18 @@ namespace SaljPartOrderForms
                                 if (!string.IsNullOrEmpty(sOrderNr) && iLevFlagga < 5)
                                 {
                                     //MessageBox.Show("radera texter " + CompOrder.Item("ogrAnrMcEdit").Text);
+
                                     RaderaRabattTexter();
+
+                                    decimal brutto = decimal.Parse(CompOrder.Item("ogrPruMcEdit").Text.Replace(".", ","));
+                                    if (brutto <= 0)
+                                    {
+                                        MessageBox.Show("VARNING!!! Brutto: " + brutto, "Varning!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                    }
+
                                     if (edbBruttoPris.Text != "" && decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
                                     {
-                                        //MessageBox.Show("lägg till texter " + CompOrder.Item("ogrAnrMcEdit").Text);
+                                                
                                         LäggUppRabattTexter();
                                         if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim())
                                         {

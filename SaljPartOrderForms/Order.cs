@@ -122,7 +122,6 @@ namespace SaljPartOrderForms
     { 
         try
         {
-
                 CompOrder.Item("vrabattGroupBox").Visible = true;
                 CompOrder.Item("prisinfoBitBtn").Visible = true;
                 CompOrder.Item("mceOgrREV").Visible = true;
@@ -505,7 +504,8 @@ namespace SaljPartOrderForms
             {
                 if(!disposed)
                 {
-                     if(CompOrder.Item("edbBruttoPris") != null && iLevFlagga < 5) { 
+                    
+                    if(CompOrder.Item("edbBruttoPris") != null && iLevFlagga < 5) { 
                         switch (CompOrder.CurrentField)
                         {
                             case "ogrOraMcEdit":
@@ -908,13 +908,32 @@ namespace SaljPartOrderForms
         private void BeräknaNetto()
         {
             decimal cNettoBel;
-            /*
-            MessageBox.Show(asRabattBas[0, 2]);
-            MessageBox.Show(asRabattBas[1, 2]);
-            MessageBox.Show(asRabattBas[2, 2]);
-            MessageBox.Show(asRabattBas[3, 2]);
-            MessageBox.Show(asRabattBas[4, 2]);
-            */
+            edbPallRab.Color = 16777215;
+            edbKvantRab.Color = 16777215;
+            edbAvtalsRab.Color = 16777215;
+            edbAktRab.Color = 16777215;
+            edbKundRab.Color = 16777215;
+
+            //Om artikel har kod1=R så körs initrabattdelen ändå men vi hoppar över att pilla på pris
+            if (decimal.Parse(edbPallRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbKvantRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbAvtalsRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbAktRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbKundRab.Text.Replace(".", ",")) == 0)
+            {
+                try
+                {
+                    edbPallRab.Color = 255;
+                    edbKvantRab.Color = 255;
+                    edbAvtalsRab.Color = 255;
+                    edbAktRab.Color = 255;
+                    edbKundRab.Color = 255;
+                   
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    return;
+                }
+
+            }
+             
             string tmp = "a";
 
             //MessageBox.Show(" C " + CompOrder.Item("ogrPriMcEdit").Text);
@@ -1164,6 +1183,13 @@ namespace SaljPartOrderForms
                     //MessageBox.Show("on_AfterScrollOrderRow iLevFlagga: " + iLevFlagga);
                     //MessageBox.Show(string.IsNullOrEmpty(sOrderNr).ToString());
                     //sOrderNr is not blank if we scrolled from a row which was a rabattrow so save orderrowtext
+
+                    //240410 Nolla allt direkt om ny orderrad
+                    if (string.IsNullOrEmpty(CompOrder.Item("ogrAnrMcEdit").Text))
+                    {
+                        InitForNoRabatt();
+                    }
+
                     haschangedprice = false;
 
                     if (checkNewRow())

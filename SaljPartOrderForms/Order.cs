@@ -1204,7 +1204,15 @@ namespace SaljPartOrderForms
 
                                 InitForRabatt();
 
-                                if (!string.IsNullOrEmpty(sOrderNr) && iLevFlagga < 5)
+                                if (decimal.Parse(edbPallRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbKvantRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbAvtalsRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbAktRab.Text.Replace(".", ",")) == 0 && decimal.Parse(edbKundRab.Text.Replace(".", ",")) == 0)
+                                {
+                                    //MessageBox.Show("All 0.00 so reset");
+                                    //Artikel flaggad för rabatt men ingen rabatt hittades för denna kund.
+                                    InitForNoRabatt();
+                                    return;
+                                }
+
+                                    if (!string.IsNullOrEmpty(sOrderNr) && iLevFlagga < 5)
                                 {
                                     //MessageBox.Show("radera texter " + CompOrder.Item("ogrAnrMcEdit").Text);
 

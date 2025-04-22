@@ -447,6 +447,8 @@ namespace SaljPartOrderForms
             if (oArtReg.Find(sArtNr))
             {
                 sUrsprPris = oArtPris.Value;
+                CompOrder.Item("ogrPruMcEdit").Text = sUrsprPris.ToString();
+
                 //MessageBox.Show("Z1 " + sUrsprPris);
                 if (edbBruttoPris.Text !="" && decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
                 {
@@ -555,7 +557,14 @@ namespace SaljPartOrderForms
                         switch (CompOrder.CurrentField)
                         {
                             case "ogrAnrMcEdit": // Artikelnummer
+                                //MessageBox.Show("ArtikelnrExit");
+                                CompOrder.Item("ogrNX1McEdit").Text = "0";
+
                                 InitKontroll(); // Subanrop
+
+                                LäsInAPris(); // Subanrop
+                                LäsInRabatter(); // Subanrop
+                                BeräknaNetto(); // Subanrop
                                 break;
                             case "ogrOraMcEdit": // Orderantal
                                 LoggaAntalsÄndringar(); // Subanrop
@@ -580,6 +589,8 @@ namespace SaljPartOrderForms
                                         edbBruttoPris.Text = sUrsprPris;
                                     }
                                 }
+                                //MessageBox.Show("ogrNX1McEdit " + edbBruttoPris.Text.Trim().Replace(".", ""));
+
                                 CompOrder.Item("ogrNX1McEdit").Text = edbBruttoPris.Text.Trim().Replace(".", "");
                                 LäsInAPris(); // Subanrop
                                 LäsInRabatter(); // Subanrop
@@ -1219,10 +1230,20 @@ namespace SaljPartOrderForms
                                     RaderaRabattTexter();
 
                                     decimal brutto = decimal.Parse(CompOrder.Item("ogrPruMcEdit").Text.Replace(".", ","));
+                                    decimal netto = decimal.Parse(CompOrder.Item("ogrPriMcEdit").Text.Replace(".", ","));
+
+
                                     if (brutto <= 0)
                                     {
                                         MessageBox.Show("VARNING!!! Brutto: " + brutto, "Varning!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                     }
+
+                                    if (netto > brutto)
+                                    {
+                                        MessageBox.Show("VARNING!!! Netto större än brutto. " + netto, "Varning!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                    }
+
+
 
                                     if (edbBruttoPris.Text != "" && decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
                                     {

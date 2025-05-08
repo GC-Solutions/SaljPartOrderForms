@@ -570,6 +570,7 @@ namespace SaljPartOrderForms
                                 LoggaAntalsÄndringar(); // Subanrop
                                 LäsInRabatter(); // Subanrop
                                 BeräknaNetto(); // Subanrop
+                                SendKeys.SendWait("+{F5}");
                                 break;
                             case "edbBruttoPris":
                                 if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim() && !haschangedprice)
@@ -798,6 +799,7 @@ namespace SaljPartOrderForms
                         if (cAntal % Convert.ToDecimal(aoTabNum[7].Value) == 0) // Om antal = helpall
                         {
                             edbPallRab.Text = (Convert.ToDecimal(aoTabNum[1].Value) / 100).ToString("0.00").Replace(",", ".");
+                            //MessageBox.Show("LäsInRabattTyper Antal A");
                         }
                         else
                         {
@@ -806,6 +808,7 @@ namespace SaljPartOrderForms
                             cPallRab = cPallRab / cAntal; // Orderantal / antal med rabatt
                             cPallRab = cPallRab * Convert.ToDecimal(aoTabNum[1].Value); // Vägd rabatt
                             edbPallRab.Text = (cPallRab / 100).ToString("0.00").Replace(",", ".");
+                            //MessageBox.Show("LäsInRabattTyper Antal B");
                         }
                         edbPallRab.Text = edbPallRab.Text; // Centrera värdet
                     }
@@ -1247,7 +1250,7 @@ namespace SaljPartOrderForms
 
                                     if (edbBruttoPris.Text != "" && decimal.Parse(edbBruttoPris.Text.Replace(".", ",")) != 0)
                                     {
-                                                
+                                        //MessageBox.Show("LäggUppRabattTexter");      
                                         LäggUppRabattTexter();
                                         if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim())
                                         {

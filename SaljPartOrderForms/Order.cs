@@ -571,6 +571,7 @@ namespace SaljPartOrderForms
                                 LäsInRabatter(); // Subanrop
                                 BeräknaNetto(); // Subanrop
                                 SendKeys.SendWait("+{F5}");
+                                CompOrder.Item("edbBruttoPris").SetFocus();
                                 break;
                             case "edbBruttoPris":
                                 if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim() && !haschangedprice)

@@ -212,7 +212,8 @@ namespace SaljPartOrderForms
                 CompOrder.Item("Label53").Top = 130; // Note: Adjusted, possibly a typo in VB
                 CompOrder.Item("Label53").Top = 330;
                 CompOrder.Item("ogrPriMcEdit").Visible = false;
-                CompOrder.Item("ogrResMcEdit").TabStop = false;
+                //20250521 var false ändrade till true för att få samma antal enter/tab till ny orderrad som de utan rabatthantering
+                CompOrder.Item("ogrResMcEdit").TabStop = true;
                 CompOrder.Item("ogr2SesMcEdit").Visible = false; //Nya fält i 4.03
                 CompOrder.Item("ogr2SesLookupBtn").Visible = false; //Nya fält i 4.03
                 CompOrder.Item("lblogr2McEdit").Visible = false; //Nya fält i 4.03
@@ -570,9 +571,16 @@ namespace SaljPartOrderForms
                                 LoggaAntalsÄndringar(); // Subanrop
                                 LäsInRabatter(); // Subanrop
                                 BeräknaNetto(); // Subanrop
-                                SendKeys.SendWait("+{F5}");
-                                CompOrder.Item("edbBruttoPris").SetFocus();
-                                break;
+                                if ((edbPallRab.Text != "" && decimal.Parse(edbPallRab.Text.Replace(".", ",")) != 0) || (edbKvantRab.Text != "" && decimal.Parse(edbKvantRab.Text.Replace(".", ",")) != 0))
+                                {
+                                    //MessageBox.Show("NU");
+                                    RaderaRabattTexter();
+                                    LäggUppRabattTexter();
+                                   //on_AfterScrollOrderRow();
+                                }
+                                    //SendKeys.SendWait("+{F5}");
+                                    //CompOrder.Item("edbBruttoPris").SetFocus();
+                                    break;
                             case "edbBruttoPris":
                                 if (edbBruttoPris.Text.Trim() != sUrsprPris.Trim() && !haschangedprice)
                                 {
@@ -629,6 +637,22 @@ namespace SaljPartOrderForms
                             edbRadText.Text = string.Empty;
                             edbRadText.SetFocus();
                         }
+                    }else if (CompOrder.CurrentField == "ogrPriMcEdit")
+                    {                                              
+                        //MessageBox.Show(CompOrder.Item("ogrPriMcEdit").Text + " - " + sUrsprPris + " - " + haschangedprice);
+                        if (CompOrder.Item("ogrPriMcEdit").Text != sUrsprPris.Trim() && !haschangedprice)
+                        {
+                            sPrisfråga = MessageBox.Show("Vill du verkligen ändra A-priset?", "Fråga?", MessageBoxButtons.YesNo, MessageBoxIcon.Question).ToString();
+                            if (sPrisfråga == "Yes")
+                            {
+                                haschangedprice = true;
+                            }
+                            else if (sPrisfråga == "No")
+                            {
+                                CompOrder.Item("ogrPriMcEdit").Text = sUrsprPris;
+                            }
+                        }
+
                     }
                 }
             }
